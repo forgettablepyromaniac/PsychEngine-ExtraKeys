@@ -51,6 +51,7 @@ class TitleState extends MusicBeatState
 	var titleTextAlphas:Array<Float> = [1, .64];
 
 	var curWacky:Array<String> = [];
+	var curWocky:String;
 
 	var wackyImage:FlxSprite;
 
@@ -82,6 +83,7 @@ class TitleState extends MusicBeatState
 		FlxG.keys.preventDefaultKeys = [TAB];
 
 		curWacky = FlxG.random.getObject(getIntroTextShit());
+		curWocky = FlxG.random.getObject(getTheOtherFunnyText());
 
 		super.create();
 
@@ -242,8 +244,6 @@ class TitleState extends MusicBeatState
 
 			default:
 			//EDIT THIS ONE IF YOU'RE MAKING A SOURCE CODE MOD!!!!
-			//EDIT THIS ONE IF YOU'RE MAKING A SOURCE CODE MOD!!!!
-			//EDIT THIS ONE IF YOU'RE MAKING A SOURCE CODE MOD!!!!
 				gfDance.frames = Paths.getSparrowAtlas('gfDanceTitle');
 				gfDance.animation.addByIndices('danceLeft', 'gfDance', [30, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14], "", 24, false);
 				gfDance.animation.addByIndices('danceRight', 'gfDance', [15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29], "", 24, false);
@@ -338,6 +338,17 @@ class TitleState extends MusicBeatState
 		}
 
 		return swagGoodArray;
+	}
+
+	function getTheOtherFunnyText():Array<String> {
+		#if MODS_ALLOWED
+		var ultimateArray:Array<String> = Mods.mergeAllTextsNamed('data/funnyText.txt', Paths.getSharedPath());
+		#else
+		var theText:String = Assets.getText(Paths.txt('funnyText'));
+		var ultimateArray:Array<String> = theText.split('\n');
+		#end
+		
+		return ultimateArray;
 	}
 
 	var transitioning:Bool = false;
@@ -551,14 +562,14 @@ class TitleState extends MusicBeatState
 					#if PSYCH_WATERMARKS
 					createCoolText(['Psych Engine by'], 40);
 					#else
-					createCoolText(['ninjamuffin99', 'phantomArcade', 'kawaisprite', 'evilsk8er']);
+					createCoolText(['The SQUAD']);
 					#end
 				case 4:
 					#if PSYCH_WATERMARKS
 					addMoreText('Shadow Mario', 40);
 					addMoreText('Riveren', 40);
 					#else
-					addMoreText('present');
+					addMoreText('represent');
 					#end
 				case 5:
 					deleteCoolText();
@@ -566,7 +577,7 @@ class TitleState extends MusicBeatState
 					#if PSYCH_WATERMARKS
 					createCoolText(['Not associated', 'with'], -40);
 					#else
-					createCoolText(['In association', 'with'], -40);
+					createCoolText(['With no', 'relation to'], -40);
 					#end
 				case 8:
 					addMoreText('newgrounds', -40);
@@ -581,12 +592,12 @@ class TitleState extends MusicBeatState
 				case 13:
 					deleteCoolText();
 				case 14:
-					addMoreText('Friday');
+					addMoreText('Shaggy');
 				case 15:
-					addMoreText('Night');
+					addMoreText('Rezoinked');
 				case 16:
-					addMoreText('Funkin'); // credTextShit.text += '\nFunkin';
-
+					addMoreText(''); // credTextShit.text += '\nFunkin';
+					addMoreText(curWocky);
 				case 17:
 					skipIntro();
 			}

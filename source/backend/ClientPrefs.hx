@@ -35,7 +35,7 @@ import states.TitleState;
 		[0xFF8b4aff, 0xFFFFFFFF, 0xFF3b177d],
 		[0xFFFF0000, 0xFFFFFFFF, 0xFF660000],
 		[0xFF0033ff, 0xFFFFFFFF, 0xFF000066]];
-	public var arrowRGBPixelExtra:Array<Array<FlxColor>> = [
+	public var arrowRGBPixelExtra:Array<Array<FlxColor>> = [ // man who even cares
 		[0xFFE276FF, 0xFFFFF9FF, 0xFF60008D],
 		[0xFF3DCAFF, 0xFFF4FFFF, 0xFF003060],
 		[0xFF71E300, 0xFFF6FFE6, 0xFF003100],
