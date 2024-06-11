@@ -89,10 +89,10 @@ class NotesSubState extends MusicBeatSubstate
 		bg.alpha = 0.25;
 		add(bg);
 		
-		var text:Alphabet = new Alphabet(50, 86, 'CTRL', false);
-		text.alignment = CENTERED;
-		text.setScale(0.4);
-		add(text);
+		// var text:Alphabet = new Alphabet(50, 86, 'CTRL', false);
+		// text.alignment = CENTERED;
+		// text.setScale(0.4);
+		// add(text);
 
 		copyButton = new FlxSprite(760, 50).loadGraphic(Paths.image('noteColorMenu/copy'));
 		copyButton.alpha = 0.6;
@@ -239,15 +239,16 @@ class NotesSubState extends MusicBeatSubstate
 			controllerPointer.y = Math.max(0, Math.min(FlxG.height, controllerPointer.y + analogY * 1000 * elapsed));
 		}
 		var controllerPressed:Bool = (controls.controllerMode && controls.ACCEPT);
-		//
 
-		if(FlxG.keys.justPressed.CONTROL)
-		{
-			onPixel = !onPixel;
-			spawnNotes();
-			updateNotes(true);
-			FlxG.sound.play(Paths.sound('scrollMenu'), 0.6);
-		}
+		// remove the ability to select Pixel notes - we dont need them and it'll crash when they try
+
+		// if(FlxG.keys.justPressed.CONTROL)
+		// {
+		// 	onPixel = !onPixel;
+		// 	spawnNotes();
+		// 	updateNotes(true);
+		// 	FlxG.sound.play(Paths.sound('scrollMenu'), 0.6);
+		// }
 
 		if(hexTypeNum > -1)
 		{
@@ -408,13 +409,13 @@ class NotesSubState extends MusicBeatSubstate
 				FlxG.sound.play(Paths.sound('scrollMenu'), 0.6);
 				updateColors();
 			}
-			else if (pointerOverlaps(skinNote))
-			{
-				onPixel = !onPixel;
-				spawnNotes();
-				updateNotes(true);
-				FlxG.sound.play(Paths.sound('scrollMenu'), 0.6);
-			}
+			// else if (pointerOverlaps(skinNote))
+			// {
+			// 	onPixel = !onPixel;
+			// 	spawnNotes();
+			// 	updateNotes(true);
+			// 	FlxG.sound.play(Paths.sound('scrollMenu'), 0.6);
+			// }
 			else if(pointerY() >= hexTypeLine.y && pointerY() < hexTypeLine.y + hexTypeLine.height &&
 					Math.abs(pointerX() - 1000) <= 84)
 			{
@@ -569,7 +570,7 @@ class NotesSubState extends MusicBeatSubstate
 	}
 
 	// notes sprites functions
-	var skinNote:FlxSprite;
+	// var skinNote:FlxSprite;
 	var modeNotes:FlxTypedGroup<FlxSprite>;
 	var myNotes:FlxTypedGroup<StrumNote>;
 	var bigNote:Note;
@@ -590,11 +591,11 @@ class NotesSubState extends MusicBeatSubstate
 		modeNotes.clear();
 		myNotes.clear();
 
-		if(skinNote != null)
-		{
-			remove(skinNote);
-			skinNote.destroy();
-		}
+		// if(skinNote != null)
+		// {
+		// 	remove(skinNote);
+		// 	skinNote.destroy();
+		// }
 		if(bigNote != null)
 		{
 			remove(bigNote);
@@ -602,15 +603,15 @@ class NotesSubState extends MusicBeatSubstate
 		}
 
 		// respawn stuff
-		var res:Int = onPixel ? 160 : 17;
-		skinNote = new FlxSprite(48, 24).loadGraphic(Paths.image('noteColorMenu/' + (onPixel ? 'note' : 'notePixel')), true, res, res);
-		skinNote.antialiasing = ClientPrefs.data.antialiasing;
-		skinNote.setGraphicSize(68);
-		skinNote.updateHitbox();
-		skinNote.animation.add('anim', [0], 24, true);
-		skinNote.animation.play('anim', true);
-		if(!onPixel) skinNote.antialiasing = false;
-		add(skinNote);
+		// var res:Int = onPixel ? 160 : 17;
+		// skinNote = new FlxSprite(48, 24).loadGraphic(Paths.image('noteColorMenu/' + (onPixel ? 'note' : 'notePixel')), true, res, res);
+		// skinNote.antialiasing = ClientPrefs.data.antialiasing;
+		// skinNote.setGraphicSize(68);
+		// skinNote.updateHitbox();
+		// skinNote.animation.add('anim', [0], 24, true);
+		// skinNote.animation.play('anim', true);
+		// if(!onPixel) skinNote.antialiasing = false;
+		// add(skinNote);
 
 		var res:Int = !onPixel ? 160 : 17;
 		for (i in 0...3)
