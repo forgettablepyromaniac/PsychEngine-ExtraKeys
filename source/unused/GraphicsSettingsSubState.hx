@@ -1,6 +1,6 @@
 package options;
 
-import objects.Character;
+import objects.Character; // hopefully this whole thing goes unused if i did this right
 
 class GraphicsSettingsSubState extends BaseOptionsMenu
 {

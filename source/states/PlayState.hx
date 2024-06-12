@@ -642,11 +642,7 @@ class PlayState extends MusicBeatState
 		uiGroup.cameras = [camHUD];
 		noteGroup.cameras = [camHUD];
 
-		if (ClientPrefs.data.ratingsCam == 'camHUD') { // I was hoping to set the camera to the string that ratingsCam is but i'll take what I can get.
-			comboGroup.cameras = [camHUD];
-		} else {
-			comboGroup.cameras = [camGame];
-		}
+		comboGroup.cameras = [LuaUtils.cameraFromString(ClientPrefs.data.ratingsCam)];
 
 		startingSong = true;
 
@@ -2579,6 +2575,9 @@ class PlayState extends MusicBeatState
 			antialias = !isPixelStage;
 		}
 
+		var minAngularVelocity:Float = -20;
+		var maxAngularVelocity:Float = 20;
+
 		rating.loadGraphic(Paths.image(uiPrefix + daRating.image + uiSuffix));
 		rating.screenCenter();
 		rating.x = placement - 40;
@@ -2590,6 +2589,8 @@ class PlayState extends MusicBeatState
 		rating.x += ClientPrefs.data.comboOffset[0];
 		rating.y -= ClientPrefs.data.comboOffset[1];
 		rating.antialiasing = antialias;
+		
+		rating.angularVelocity = ClientPrefs.data.rotateRatings ? FlxG.random.float(minAngularVelocity, maxAngularVelocity) : 0;
 
 		var comboSpr:FlxSprite = new FlxSprite().loadGraphic(Paths.image(uiPrefix + 'combo' + uiSuffix));
 		comboSpr.screenCenter();
@@ -2602,6 +2603,7 @@ class PlayState extends MusicBeatState
 		comboSpr.antialiasing = antialias;
 		comboSpr.y += 60;
 		comboSpr.velocity.x += FlxG.random.int(1, 10) * playbackRate;
+		comboSpr.angularVelocity = FlxG.random.float(minAngularVelocity, maxAngularVelocity);
 		comboGroup.add(rating);
 
 		if (!PlayState.isPixelStage)
@@ -2648,18 +2650,20 @@ class PlayState extends MusicBeatState
 			numScore.velocity.x = FlxG.random.float(-5, 5) * playbackRate;
 			numScore.visible = !ClientPrefs.data.hideHud;
 			numScore.antialiasing = antialias;
+			numScore.angularVelocity = ClientPrefs.data.rotateRatings ? FlxG.random.float(minAngularVelocity/2, maxAngularVelocity/2) : 0;
 
-			//if (combo >= 10 || combo == 0)
-			if(showComboNum)
-				comboGroup.add(numScore);
+			if (combo >= 10 || combo == 0) {
+				if(showComboNum)
+					comboGroup.add(numScore);
 
-			FlxTween.tween(numScore, {alpha: 0}, 0.2 / playbackRate, {
-				onComplete: function(tween:FlxTween)
-				{
-					numScore.destroy();
-				},
-				startDelay: Conductor.crochet * 0.002 / playbackRate
-			});
+				FlxTween.tween(numScore, {alpha: 0}, 0.2 / playbackRate, {
+					onComplete: function(tween:FlxTween)
+					{
+						numScore.destroy();
+					},
+					startDelay: Conductor.crochet * 0.002 / playbackRate
+				});
+			}
 
 			daLoop++;
 			if(numScore.x > xThing) xThing = numScore.x;

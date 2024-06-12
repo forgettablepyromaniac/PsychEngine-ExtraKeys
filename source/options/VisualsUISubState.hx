@@ -3,6 +3,7 @@ package options;
 import objects.Note;
 import objects.StrumNote;
 import objects.Alphabet;
+import objects.Character;
 
 class VisualsUISubState extends BaseOptionsMenu
 {
@@ -10,10 +11,20 @@ class VisualsUISubState extends BaseOptionsMenu
 	var notes:FlxTypedGroup<StrumNote>;
 	var notesTween:Array<FlxTween> = [];
 	var noteY:Float = 90;
+	var antialiasingOption:Int;
+	var boyfriend:Character = null;
+
 	public function new()
 	{
-		title = 'Visuals and UI';
-		rpcTitle = 'Visuals & UI Settings Menu'; //for Discord Rich Presence
+		title = 'Graphics, Visuals and UI';
+		rpcTitle = 'Graphics, Visuals and UI Menu'; //for Discord Rich Presence
+
+		boyfriend = new Character(840, 170, 'bf', true);
+		boyfriend.setGraphicSize(Std.int(boyfriend.width * 0.75));
+		boyfriend.updateHitbox();
+		boyfriend.dance();
+		boyfriend.animation.finishCallback = function (name:String) boyfriend.dance();
+		boyfriend.visible = false;
 
 		// for note skins
 		notes = new FlxTypedGroup<StrumNote>();
@@ -62,7 +73,7 @@ class VisualsUISubState extends BaseOptionsMenu
 		}
 
 		var option:Option = new Option('Note Splash Opacity:',
-			'How much transparent should the Note Splashes be.',
+			'How transparent the Note Splashes will be.',
 			'splashAlpha',
 			'percent');
 		option.scrollSpeed = 1.6;
@@ -76,13 +87,6 @@ class VisualsUISubState extends BaseOptionsMenu
 			'If checked, hides most HUD elements.',
 			'hideHud',
 			'bool');
-		addOption(option);
-
-		var option:Option = new Option('Ratings Camera:', // new OPTION WOAH
-		"What camera should the Ratings be displayed on?\n(camGame to follow BF, camHUD to keep it still).",
-		'ratingsCam',
-		'string',
-		['camGame', 'camHUD']);
 		addOption(option);
 		
 		var option:Option = new Option('Time Bar:',
@@ -138,13 +142,13 @@ class VisualsUISubState extends BaseOptionsMenu
 		addOption(option);
 		option.onChange = onChangePauseMusic;
 		
-		#if CHECK_FOR_UPDATES
-		var option:Option = new Option('Check for Updates',
-			'On Release builds, turn this on to check for updates when you start the game.',
-			'checkForUpdates',
-			'bool');
-		addOption(option);
-		#end
+		// #if CHECK_FOR_UPDATES
+		// var option:Option = new Option('Check for Updates',
+		// 	'On Release builds, turn this on to check for updates when you start the game.',
+		// 	'checkForUpdates',
+		// 	'bool');
+		// addOption(option);
+		// #end
 
 		#if DISCORD_ALLOWED
 		var option:Option = new Option('Discord Rich Presence',
@@ -160,7 +164,63 @@ class VisualsUISubState extends BaseOptionsMenu
 			'bool');
 		addOption(option);
 
+		var option:Option = new Option('Rotating Ratings',
+		"What a mouthful! Turn this off if they're too distracting.",
+		'rotateRatings',
+		'bool');
+		addOption(option);
+
+		var option:Option = new Option('Ratings Camera:',
+		"What camera should the Ratings be displayed on?\n(camGame to follow BF, camHUD to keep it still).",
+		'ratingsCam',
+		'string',
+		['camGame', 'camHUD']);
+		addOption(option);
+
+		//I'd suggest using "Low Quality" as an example for making your own option since it is the simplest here
+		var option:Option = new Option('Low Quality', //Name
+			'If checked, disables some background details to\ndecrease loading times and improve performance.', //Description
+			'lowQuality', //Save data variable name
+			'bool'); //Variable type
+		addOption(option);
+
+		var option:Option = new Option('Anti-Aliasing',
+			'If unchecked, disables anti-aliasing, increases performance\nat the cost of sharper visuals.',
+			'antialiasing',
+			'bool');
+		option.onChange = onChangeAntiAliasing; //Changing onChange is only needed if you want to make a special interaction after it changes the value
+		addOption(option);
+		antialiasingOption = optionsArray.length-1;
+
+		var option:Option = new Option('Shaders', //Name
+			"If unchecked, disables shaders.\nIt's used for some visual effects, and also CPU intensive for weaker PCs.", //Description
+			'shaders',
+			'bool');
+		addOption(option);
+
+		var option:Option = new Option('GPU Caching', //Name
+			"If checked, allows the GPU to be used for caching textures, decreasing RAM usage.\nDon't turn this on if you have a shitty Graphics Card.", //Description
+			'cacheOnGPU',
+			'bool');
+		addOption(option);
+
+		#if !html5 //Apparently other framerates isn't correctly supported on Browser? Probably it has some V-Sync shit enabled by default, idk
+		var option:Option = new Option('Framerate',
+			"Pretty self explanatory, isn't it?",
+			'framerate',
+			'int');
+		addOption(option);
+		#end
+
+		final refreshRate:Int = FlxG.stage.application.window.displayMode.refreshRate;
+		option.minValue = 60;
+		option.maxValue = 240;
+		option.defaultValue = Std.int(FlxMath.bound(refreshRate, option.minValue, option.maxValue));
+		option.displayFormat = '%v FPS';
+		option.onChange = onChangeFramerate;
+
 		super();
+		insert(1, boyfriend);
 		add(notes);
 	}
 
@@ -211,6 +271,31 @@ class VisualsUISubState extends BaseOptionsMenu
 		note.texture = skin; //Load texture and anims
 		note.reloadNote();
 		note.playAnim('static');
+	}
+
+	function onChangeAntiAliasing()
+		{
+			for (sprite in members)
+			{
+				var sprite:FlxSprite = cast sprite;
+				if(sprite != null && (sprite is FlxSprite) && !(sprite is FlxText)) {
+					sprite.antialiasing = ClientPrefs.data.antialiasing;
+				}
+			}
+		}
+	
+	function onChangeFramerate()
+	{
+		if(ClientPrefs.data.framerate > FlxG.drawFramerate)
+		{
+			FlxG.updateFramerate = ClientPrefs.data.framerate;
+			FlxG.drawFramerate = ClientPrefs.data.framerate;
+		}
+		else
+		{
+			FlxG.drawFramerate = ClientPrefs.data.framerate;
+			FlxG.updateFramerate = ClientPrefs.data.framerate;
+		}
 	}
 
 	override function destroy()

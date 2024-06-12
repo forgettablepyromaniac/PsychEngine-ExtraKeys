@@ -88,6 +88,7 @@ import states.TitleState;
 	public var discordRPC:Bool = true;
 
 	public var ratingsCam:String = "camGame";
+	public var rotateRatings:Bool = true;
 }
 
 class ClientPrefs {
