@@ -1,0 +1,50 @@
+{
+	"songs": [
+		[
+			"kaio-ken",
+			"dad",
+			[
+				146,
+				113,
+				253
+			]
+		],
+		[
+			"super-saiyan",
+			"dad",
+			[
+				146,
+				113,
+				253
+			]
+		],
+		[
+			"god-eater",
+			"dad",
+			[
+				146,
+				113,
+				253
+			]
+		]
+	],
+	"hiddenUntilUnlocked": false,
+	"hideFreeplay": false,
+	"weekBackground": "stage",
+	"difficulties": "",
+	"weekCharacters": [
+		"dad",
+		"bf",
+		"gf"
+	],
+	"storyName": "The Test Run(tm)",
+	"weekName": "The SHAGGINGYOURMOM week",
+	"freeplayColor": [
+		146,
+		113,
+		253
+	],
+	"hideStoryMode": false,
+	"weekBefore": "tutorial",
+	"startUnlocked": true
+}

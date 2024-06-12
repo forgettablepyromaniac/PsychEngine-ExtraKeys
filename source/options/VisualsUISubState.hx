@@ -61,7 +61,7 @@ class VisualsUISubState extends BaseOptionsMenu
 			addOption(option);
 		}
 
-		var option:Option = new Option('Note Splash Opacity',
+		var option:Option = new Option('Note Splash Opacity:',
 			'How much transparent should the Note Splashes be.',
 			'splashAlpha',
 			'percent');
@@ -76,6 +76,13 @@ class VisualsUISubState extends BaseOptionsMenu
 			'If checked, hides most HUD elements.',
 			'hideHud',
 			'bool');
+		addOption(option);
+
+		var option:Option = new Option('Ratings Camera:', // new OPTION WOAH
+		"What camera should the Ratings be displayed on?\n(camGame to follow BF, camHUD to keep it still).",
+		'ratingsCam',
+		'string',
+		['camGame', 'camHUD']);
 		addOption(option);
 		
 		var option:Option = new Option('Time Bar:',

@@ -177,6 +177,9 @@ class PlayState extends MusicBeatState
 	public var health(default, set):Float = 1;
 	public var combo:Int = 0;
 
+	public var comboOffsetX:Int = 500; // camGame offsetFix
+    public var comboOffsetY:Int = 300; // (editable so other characters can have proper offsets)
+
 	public var healthBar:Bar;
 	public var timeBar:Bar;
 	var songPercent:Float = 0;
@@ -207,6 +210,7 @@ class PlayState extends MusicBeatState
 	public var camHUD:FlxCamera;
 	public var camGame:FlxCamera;
 	public var camOther:FlxCamera;
+	public var camNotes:FlxCamera;
 	public var cameraSpeed:Float = 1;
 
 	public var songScore:Int = 0;
@@ -359,10 +363,13 @@ class PlayState extends MusicBeatState
 		camGame = initPsychCamera();
 		camHUD = new FlxCamera();
 		camOther = new FlxCamera();
+		camNotes = new FlxCamera();
 		camHUD.bgColor.alpha = 0;
 		camOther.bgColor.alpha = 0;
+		camNotes.bgColor.alpha = 0;
 
 		FlxG.cameras.add(camHUD, false);
+		FlxG.cameras.add(camNotes, false);
 		FlxG.cameras.add(camOther, false);
 		grpNoteSplashes = new FlxTypedGroup<NoteSplash>();
 
@@ -634,7 +641,12 @@ class PlayState extends MusicBeatState
 
 		uiGroup.cameras = [camHUD];
 		noteGroup.cameras = [camHUD];
-		comboGroup.cameras = [camHUD];
+
+		if (ClientPrefs.data.ratingsCam == 'camHUD') { // I was hoping to set the camera to the string that ratingsCam is but i'll take what I can get.
+			comboGroup.cameras = [camHUD];
+		} else {
+			comboGroup.cameras = [camGame];
+		}
 
 		startingSong = true;
 
@@ -694,6 +706,12 @@ class PlayState extends MusicBeatState
 			Paths.music(Paths.formatToSongPath(ClientPrefs.data.pauseMusic));
 
 		resetRPC();
+
+		strumLineNotes.cameras = [camNotes];
+		notes.cameras = [camNotes];
+    	grpNoteSplashes.cameras = [camNotes];
+
+		camNotes.zoom = 0.95;
 
 		callOnScripts('onCreatePost');
 
@@ -1687,7 +1705,7 @@ class PlayState extends MusicBeatState
 	var startedCountdown:Bool = false;
 	var canPause:Bool = true;
 	var freezeCamera:Bool = false;
-	var allowDebugKeys:Bool = true;
+	var allowDebugKeys:Bool = true; // TODO disable before final export
 
 	override public function update(elapsed:Float)
 	{
@@ -1706,6 +1724,11 @@ class PlayState extends MusicBeatState
 		callOnScripts('onUpdate', [elapsed]);
 
 		super.update(elapsed);
+
+		if (ClientPrefs.data.ratingsCam == 'camGame') {
+			comboGroup.x = boyfriend.x - comboOffsetX; // probably not the most efficent way to do this but it works, sue me.
+			comboGroup.y = boyfriend.y - comboOffsetY;
+		}
 
 		setOnScripts('curDecStep', curDecStep);
 		setOnScripts('curDecBeat', curDecBeat);
@@ -1752,19 +1775,26 @@ class PlayState extends MusicBeatState
 			var curTime:Float = Math.max(0, Conductor.songPosition - ClientPrefs.data.noteOffset);
 			songPercent = (curTime / songLength);
 
-			var songCalc:Float = (songLength - curTime);
-			if(ClientPrefs.data.timeBarType == 'Time Elapsed') songCalc = curTime;
+			var songCalc:Float = (songLength - curTime) / playbackRate; // time fix
+
+			if (ClientPrefs.data.timeBarType == 'Time Elapsed') songCalc = curTime; // amount of time passed is ok
 
 			var secondsTotal:Int = Math.floor(songCalc / 1000);
 			if(secondsTotal < 0) secondsTotal = 0;
 
 			if(ClientPrefs.data.timeBarType != 'Song Name')
 				timeTxt.text = FlxStringUtil.formatTime(secondsTotal, false);
+			else { // this is what was fucked up, hopefully this fixes it.
+				var secondsTotal:Int = Math.floor(songCalc/1000);
+				if(secondsTotal < 0) secondsTotal = 0;
+				timeTxt.text = FlxStringUtil.formatTime(secondsTotal,false);
+			}
 		}
 
 		if (camZooming)
 		{
 			FlxG.camera.zoom = FlxMath.lerp(defaultCamZoom, FlxG.camera.zoom, Math.exp(-elapsed * 3.125 * camZoomingDecay * playbackRate));
+			camNotes.zoom = FlxMath.lerp(0.95, camNotes.zoom, Math.exp(-elapsed * 3.125 * camZoomingDecay * playbackRate));
 			camHUD.zoom = FlxMath.lerp(1, camHUD.zoom, Math.exp(-elapsed * 3.125 * camZoomingDecay * playbackRate));
 		}
 
@@ -2068,13 +2098,13 @@ class PlayState extends MusicBeatState
 				if(flValue1 == null || flValue1 < 1) flValue1 = 1;
 				gfSpeed = Math.round(flValue1);
 
-			case 'Add Camera Zoom':
+			case 'Add Camera Zoom': // how this should have always been.
 				if(ClientPrefs.data.camZooms && FlxG.camera.zoom < 1.35) {
-					if(flValue1 == null) flValue1 = 0.015;
+					if(value1 == null) value1 = "camGame";
 					if(flValue2 == null) flValue2 = 0.03;
 
-					FlxG.camera.zoom += flValue1;
-					camHUD.zoom += flValue2;
+					var fuckingCamera:FlxCamera = LuaUtils.cameraFromString(value1);
+					fuckingCamera.zoom += flValue2;
 				}
 
 			case 'Play Animation':
@@ -3197,6 +3227,7 @@ class PlayState extends MusicBeatState
 			{
 				FlxG.camera.zoom += 0.015 * camZoomingMult;
 				camHUD.zoom += 0.03 * camZoomingMult;
+				camNotes.zoom += 0.035 * camZoomingMult;
 			}
 
 			if (SONG.notes[curSection].changeBPM)
