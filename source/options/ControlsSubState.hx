@@ -17,45 +17,21 @@ class ControlsSubState extends MusicBeatSubstate
 
 	//Show on gamepad - Display name - Save file key - Rebind display name
 	var curNoteKeys:Int = 4;
-	var options:Array<Dynamic> = [
+	var validNumOfKeys:Array<Int> = [4, 6, 9]; //easy to edit, the keys that are allowed to be shown
+
+	var options:Array<Dynamic> = [ 
 		[true, 'NOTES'],
 		[true, '4 KEY'],
-		[true, 'Note', 'note_1', '1 Key Note', 1],
-		[true, 'Left', 'note_2a', '2 Key Note Left', 2],
-		[true, 'Right', 'note_2b', '2 Key Note Right', 2],
-		[true, 'Left', 'note_3a', '3 Key Note Left', 3],
-		[true, 'Center', 'note_3b', '3 Key Note Center', 3],
-		[true, 'Right', 'note_3c', '3 Key Note Right', 3],
 		[true, 'Left', 'note_left', '4 Key Note Left', 4],
 		[true, 'Down', 'note_down', '4 Key Note Down', 4],
 		[true, 'Up', 'note_up', '4 Key Note Up', 4],
 		[true, 'Right', 'note_right', '4 Key Note Right', 4],
-		[true, 'Left', 'note_5a', '5 Key Note Left', 5],
-		[true, 'Down', 'note_5b', '5 Key Note Down', 5],
-		[true, 'Center', 'note_5c', '5 Key Note Center', 5],
-		[true, 'Up', 'note_5d', '5 Key Note Up', 5],
-		[true, 'Right', 'note_5e', '5 Key Note Right', 5],
 		[true, 'Left 1', 'note_6a', '6 Key Note Left 1', 6],
 		[true, 'Up', 'note_6b', '6 Key Note Up', 6],
 		[true, 'Right 1', 'note_6c', '6 Key Note Right 1', 6],
 		[true, 'Left 2', 'note_6d', '6 Key Note Left 2', 6],
 		[true, 'Down', 'note_6e', '6 Key Note Down', 6],
 		[true, 'Right 1', 'note_6f', '6 Key Note Right 2', 6],
-		[true, 'Left 1', 'note_7a', '7 Key Note Left 1', 7],
-		[true, 'Up', 'note_7b', '7 Key Note Up', 7],
-		[true, 'Right 1', 'note_7c', '7 Key Note Right 1', 7],
-		[true, 'Center', 'note_7d', '7 Key Note Center', 7],
-		[true, 'Left 2', 'note_7e', '7 Key Note Left 2', 7],
-		[true, 'Down', 'note_7f', '7 Key Note Down', 7],
-		[true, 'Right 2', 'note_7g', '7 Key Note Right 2', 7],
-		[true, 'Left 1', 'note_8a', '8 Key Note Left 1', 8],
-		[true, 'Down 1', 'note_8b', '8 Key Note Down 1', 8],
-		[true, 'Up 1', 'note_8c', '8 Key Note Up 1', 8],
-		[true, 'Right 1', 'note_8d', '8 Key Note Right 1', 8],
-		[true, 'Left 2', 'note_8e', '8 Key Note Left 2', 8],
-		[true, 'Down 2', 'note_8f', '8 Key Note Down 2', 8],
-		[true, 'Up 2', 'note_8g', '8 Key Note Up 2', 8],
-		[true, 'Right 2', 'note_8h', '8 Key Note Right 2', 8],
 		[true, 'Left 1', 'note_9a', '9 Key Note Left 1', 9],
 		[true, 'Down 1', 'note_9b', '9 Key Note Down 1', 9],
 		[true, 'Up 1', 'note_9c', '9 Key Note Up 1', 9],
@@ -568,11 +544,14 @@ class ControlsSubState extends MusicBeatSubstate
 
 	function keyChange(?move:Int = 0)
 		{
-			curNoteKeys += move;
-	
-			if(curNoteKeys > 9) curNoteKeys = 1;
-			if(curNoteKeys < 1) curNoteKeys = 9;
-	
+			var currentIndex:Int = validNumOfKeys.indexOf(curNoteKeys); // Find the current index of curNoteKeys in validNumOfKeys
+			currentIndex += move;
+		
+			if (currentIndex >= validNumOfKeys.length) currentIndex = 0; 
+			if (currentIndex < 0) currentIndex = validNumOfKeys.length - 1; // Wrap around the index if it goes out of bounds
+		
+			curNoteKeys = validNumOfKeys[currentIndex]; // Set curNoteKeys to the new value
+		
 			curSelected = 0;
 			curAlt = false;
 			createTexts();

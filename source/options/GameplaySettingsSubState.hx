@@ -67,13 +67,23 @@ class GameplaySettingsSubState extends BaseOptionsMenu
 		option.maxValue = 30;
 		addOption(option);
 
+		var option:Option = new Option('Perfect!! Hit Window',
+			'Changes the amount of time you have\nfor hitting a "Perfect!!" in milliseconds.',
+			'perfectWindow',
+			'int');
+		option.displayFormat = '%vms';
+		option.scrollSpeed = 10;
+		option.minValue = 0;
+		option.maxValue = 20;
+		addOption(option);
+
 		var option:Option = new Option('Sick! Hit Window',
 			'Changes the amount of time you have\nfor hitting a "Sick!" in milliseconds.',
 			'sickWindow',
 			'int');
 		option.displayFormat = '%vms';
 		option.scrollSpeed = 15;
-		option.minValue = 15;
+		option.minValue = 6;
 		option.maxValue = 45;
 		addOption(option);
 
@@ -83,7 +93,7 @@ class GameplaySettingsSubState extends BaseOptionsMenu
 			'int');
 		option.displayFormat = '%vms';
 		option.scrollSpeed = 30;
-		option.minValue = 15;
+		option.minValue = 6;
 		option.maxValue = 90;
 		addOption(option);
 
@@ -93,7 +103,7 @@ class GameplaySettingsSubState extends BaseOptionsMenu
 			'int');
 		option.displayFormat = '%vms';
 		option.scrollSpeed = 60;
-		option.minValue = 15;
+		option.minValue = 6;
 		option.maxValue = 135;
 		addOption(option);
 
