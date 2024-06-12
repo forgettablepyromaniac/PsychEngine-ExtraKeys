@@ -4,8 +4,6 @@ import flixel.FlxObject;
 import flixel.graphics.FlxGraphic;
 
 import flixel.animation.FlxAnimation;
-import flixel.system.debug.interaction.tools.Pointer.GraphicCursorCross;
-import flixel.addons.transition.FlxTransitionableState;
 import flixel.addons.ui.*;
 import flixel.ui.FlxButton;
 import flixel.util.FlxDestroyUtil;
@@ -19,6 +17,14 @@ import lime.system.Clipboard;
 import objects.Character;
 import objects.HealthIcon;
 import objects.Bar;
+
+// flixel 5.7.0+ fix
+#if (FLX_DEBUG || flixel < version("5.7.0"))
+typedef PointerGraphic = flixel.system.debug.interaction.tools.Pointer.GraphicCursorCross;
+#else
+@:bitmap("assets/images/debugger/cursorCross.png")
+class PointerGraphic extends openfl.display.BitmapData {}
+#end
 
 class CharacterEditorState extends MusicBeatState
 {
@@ -54,6 +60,8 @@ class CharacterEditorState extends MusicBeatState
 
 	var UI_box:FlxUITabMenu;
 	var UI_characterbox:FlxUITabMenu;
+
+	var unsavedProgress:Bool = false;
 
 	public function new(char:String = null, goToPlayState:Bool = true)
 	{
@@ -102,7 +110,7 @@ class CharacterEditorState extends MusicBeatState
 
 		addCharacter();
 
-		cameraFollowPointer = new FlxSprite().loadGraphic(FlxGraphic.fromClass(GraphicCursorCross));
+		cameraFollowPointer = new FlxSprite(FlxGraphic.fromClass(PointerGraphic));
 		cameraFollowPointer.setGraphicSize(40, 40);
 		cameraFollowPointer.updateHitbox();
 		add(cameraFollowPointer);
@@ -120,7 +128,7 @@ class CharacterEditorState extends MusicBeatState
 		animsTxtGroup.cameras = [camHUD];
 		add(animsTxtGroup);
 
-		var tipText:FlxText = new FlxText(FlxG.width - 300, FlxG.height - 24, 300, "Press F1 for Help", 16);
+		var tipText:FlxText = new FlxText(FlxG.width - 300, FlxG.height - 24, 300, "Press F1 for Help", 20);
 		tipText.cameras = [camHUD];
 		tipText.setFormat(null, 16, FlxColor.WHITE, RIGHT, OUTLINE_FAST, FlxColor.BLACK);
 		tipText.borderColor = FlxColor.BLACK;
@@ -706,6 +714,9 @@ class CharacterEditorState extends MusicBeatState
 	}
 
 	override function getEvent(id:String, sender:Dynamic, data:Dynamic, ?params:Array<Dynamic>) {
+		if(id == FlxUICheckBox.CLICK_EVENT)
+			unsavedProgress = true;
+
 		if(id != FlxUIInputText.CHANGE_EVENT && id != FlxUINumericStepper.CHANGE_EVENT) return;
 
 		if(sender is FlxUIInputText)
@@ -715,11 +726,18 @@ class CharacterEditorState extends MusicBeatState
 				healthIcon.changeIcon(healthIconInputText.text, false);
 				character.healthIcon = healthIconInputText.text;
 				if(lastIcon != healthIcon.getCharacter()) updatePresence();
+				unsavedProgress = true;
 			}
 			else if(sender == vocalsInputText)
+			{
 				character.vocalsFile = vocalsInputText.text;
+				unsavedProgress = true;
+			}
 			else if(sender == imageInputText)
+			{
 				character.imageFile = imageInputText.text;
+				unsavedProgress = true;
+			}
 		}
 		else if(sender is FlxUINumericStepper)
 		{
@@ -730,45 +748,54 @@ class CharacterEditorState extends MusicBeatState
 				character.scale.set(character.jsonScale, character.jsonScale);
 				character.updateHitbox();
 				updatePointerPos(false);
+				unsavedProgress = true;
 			}
 			else if(sender == positionXStepper)
 			{
 				character.positionArray[0] = positionXStepper.value;
 				updateCharacterPositions();
+				unsavedProgress = true;
 			}
 			else if(sender == positionYStepper)
 			{
 				character.positionArray[1] = positionYStepper.value;
 				updateCharacterPositions();
+				unsavedProgress = true;
 			}
 			else if(sender == singDurationStepper)
 			{
 				character.singDuration = singDurationStepper.value;
+				unsavedProgress = true;
 			}
 			else if(sender == positionCameraXStepper)
 			{
 				character.cameraPosition[0] = positionCameraXStepper.value;
 				updatePointerPos();
+				unsavedProgress = true;
 			}
 			else if(sender == positionCameraYStepper)
 			{
 				character.cameraPosition[1] = positionCameraYStepper.value;
 				updatePointerPos();
+				unsavedProgress = true;
 			}
 			else if(sender == healthColorStepperR)
 			{
 				character.healthColorArray[0] = Math.round(healthColorStepperR.value);
 				updateHealthBar();
+				unsavedProgress = true;
 			}
 			else if(sender == healthColorStepperG)
 			{
 				character.healthColorArray[1] = Math.round(healthColorStepperG.value);
 				updateHealthBar();
+				unsavedProgress = true;
 			}
 			else if(sender == healthColorStepperB)
 			{
 				character.healthColorArray[2] = Math.round(healthColorStepperB.value);
 				updateHealthBar();
+				unsavedProgress = true;
 			}
 		}
 	}
@@ -1034,8 +1061,12 @@ class CharacterEditorState extends MusicBeatState
 			FlxG.mouse.visible = false;
 			if(!_goToPlayState)
 			{
-				MusicBeatState.switchState(new states.editors.MasterEditorMenu());
-				FlxG.sound.playMusic(Paths.music('freakyMenu'));
+				if(!unsavedProgress)
+				{
+					MusicBeatState.switchState(new states.editors.MasterEditorMenu());
+					FlxG.sound.playMusic(Paths.music('freakyMenu'));
+				}
+				else openSubState(new ConfirmationPopupSubstate());
 			}
 			else MusicBeatState.switchState(new PlayState());
 			return;
@@ -1051,6 +1082,9 @@ class CharacterEditorState extends MusicBeatState
 		/////////////
 		// bg data //
 		/////////////
+		#if !BASE_GAME_FILES
+		camEditor.bgColor = 0xFF666666;
+		#else
 		var bg:BGSprite = new BGSprite('stageback', -600, -200, 0.9, 0.9);
 		add(bg);
 
@@ -1058,6 +1092,7 @@ class CharacterEditorState extends MusicBeatState
 		stageFront.setGraphicSize(Std.int(stageFront.width * 1.1));
 		stageFront.updateHitbox();
 		add(stageFront);
+		#end
 
 		dadPosition.set(100, 100);
 		bfPosition.set(770, 100);
@@ -1065,7 +1100,6 @@ class CharacterEditorState extends MusicBeatState
 
 		Paths.currentLevel = lastLoaded;
 	}
-
 
 	inline function updatePointerPos(?snap:Bool = true)
 	{
@@ -1197,7 +1231,7 @@ class CharacterEditorState extends MusicBeatState
 
 	var characterList:Array<String> = [];
 	function reloadCharacterDropDown() {
-		characterList = Mods.mergeAllTextsNamed('data/characterList.txt', Paths.getSharedPath());
+		characterList = Mods.mergeAllTextsNamed('data/characterList.txt');
 		var foldersToCheck:Array<String> = Mods.directoriesWithFile(Paths.getSharedPath(), 'characters/');
 		for (folder in foldersToCheck)
 			for (file in FileSystem.readDirectory(folder))

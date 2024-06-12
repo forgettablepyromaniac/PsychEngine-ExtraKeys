@@ -108,7 +108,7 @@ class FreeplayState extends MusicBeatState
 			Mods.currentModDirectory = songs[i].folder;
 			var icon:HealthIcon = new HealthIcon(songs[i].songCharacter);
 			icon.sprTracker = songText;
-
+			icon.xAdd = -50; // fix with win icons
 			
 			// too laggy with a lot of songs, so i had to recode the logic for it
 			songText.visible = songText.active = songText.isMenuItem = false;
