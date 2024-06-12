@@ -2593,8 +2593,8 @@ class PlayState extends MusicBeatState
 			antialias = !isPixelStage;
 		}
 
-		var minAngularVelocity:Float = -20;
-		var maxAngularVelocity:Float = 20;
+		var minAngularVelocity:Float = -ClientPrefs.data.minRatingsRotate;
+		var maxAngularVelocity:Float = ClientPrefs.data.maxRatingsRotate;
 
 		rating.loadGraphic(Paths.image(uiPrefix + daRating.image + uiSuffix));
 		rating.screenCenter();

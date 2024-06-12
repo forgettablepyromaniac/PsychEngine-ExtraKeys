@@ -170,6 +170,29 @@ class VisualsUISubState extends BaseOptionsMenu
 		'bool');
 		addOption(option);
 
+		var option:Option = new Option('Min Ratings Rotate:',
+		'The Lower Margin for Rating Rotates (how far it can go to the left).\nHigher numbers result in more wacky (Default:20).',
+		'minRatingsRotate',
+		'int');
+		option.scrollSpeed = 40;
+		option.minValue = 5;
+		option.maxValue = 240;
+		option.changeValue = 1;
+		option.decimals = 0;
+		addOption(option);
+
+		var option:Option = new Option('Max Ratings Rotate:',
+		'The Higher Margin for Rating Rotates (how far it can go to the right).\nHigher numbers result in more wacky (Default:20).',
+		'maxRatingsRotate',
+		'int');
+		option.scrollSpeed = 40;
+		option.minValue = 5;
+		option.maxValue = 240;
+		option.changeValue = 1;
+		option.decimals = 0;
+		addOption(option);
+
+
 		var option:Option = new Option('Ratings Camera:',
 		"What camera should the Ratings be displayed on?\n(camGame to follow BF, camHUD to keep it still).",
 		'ratingsCam',

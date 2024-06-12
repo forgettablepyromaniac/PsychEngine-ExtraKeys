@@ -87,8 +87,10 @@ import states.TitleState;
 	public var guitarHeroSustains:Bool = true;
 	public var discordRPC:Bool = true;
 
-	public var ratingsCam:String = "camGame";
+	public var ratingsCam:String = "camGame"; // my vars
 	public var rotateRatings:Bool = true;
+	public var minRatingsRotate:Int = 20;
+	public var maxRatingsRotate:Int = 20;
 }
 
 class ClientPrefs {
