@@ -2621,7 +2621,7 @@ class PlayState extends MusicBeatState
 		comboSpr.antialiasing = antialias;
 		comboSpr.y += 60;
 		comboSpr.velocity.x += FlxG.random.int(1, 10) * playbackRate;
-		comboSpr.angularVelocity = FlxG.random.float(minAngularVelocity, maxAngularVelocity);
+		comboSpr.angularVelocity = ClientPrefs.data.rotateRatings ? FlxG.random.float(minAngularVelocity, maxAngularVelocity) : 0; // forgot to change this one, oops!
 		comboGroup.add(rating);
 
 		if (!PlayState.isPixelStage)
