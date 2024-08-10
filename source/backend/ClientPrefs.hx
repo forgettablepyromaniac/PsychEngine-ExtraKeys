@@ -89,7 +89,6 @@ import states.TitleState;
 
 	public var ratingsCam:String = "camGame"; // my vars
 	public var rotateRatings:Bool = true;
-	public var minRatingsRotate:Int = 20;
 	public var maxRatingsRotate:Int = 20;
 }
 
